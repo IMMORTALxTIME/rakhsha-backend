@@ -1,0 +1,210 @@
+{
+  "info": {
+    "name": "Rakhsha Safety API",
+    "description": "Intelligent Safe-Route Navigation System — Complete API Collection",
+    "version": "1.0.0",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "BASE_URL", "value": "https://yourdomain.com/api/v1" },
+    { "key": "TOKEN", "value": "" },
+    { "key": "LAT", "value": "23.2599" },
+    { "key": "LNG", "value": "77.4126" }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [{ "key": "token", "value": "{{TOKEN}}", "type": "string" }]
+  },
+  "item": [
+    {
+      "name": "🔐 Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST", "url": "{{BASE_URL}}/auth/register",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"name\":\"Priya Sharma\",\"email\":\"priya@example.com\",\"phone\":\"+919876543210\",\"password\":\"SecurePass@123\"}" }
+          }
+        },
+        {
+          "name": "Login",
+          "event": [{ "listen": "test", "script": { "exec": ["const r=pm.response.json();if(r.token)pm.collectionVariables.set('TOKEN',r.token);"] } }],
+          "request": {
+            "method": "POST", "url": "{{BASE_URL}}/auth/login",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"email\":\"priya@example.com\",\"password\":\"SecurePass@123\"}" }
+          }
+        },
+        {
+          "name": "Add Emergency Contacts",
+          "request": {
+            "method": "POST", "url": "{{BASE_URL}}/auth/emergency-contacts",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"contacts\":[{\"name\":\"Mom\",\"phone\":\"+919000000001\",\"email\":\"mom@example.com\",\"relation\":\"mother\"},{\"name\":\"Sister\",\"phone\":\"+919000000002\",\"relation\":\"sibling\"}]}" }
+          }
+        },
+        { "name": "Get My Profile", "request": { "method": "GET", "url": "{{BASE_URL}}/auth/me" } },
+        { "name": "Logout", "request": { "method": "POST", "url": "{{BASE_URL}}/auth/logout" } }
+      ]
+    },
+    {
+      "name": "🗺️ Route",
+      "item": [
+        {
+          "name": "Shortest Route (A*)",
+          "request": {
+            "method": "POST", "url": "{{BASE_URL}}/route/shortest",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"origin\":{\"lat\":23.2599,\"lng\":77.4126},\"destination\":{\"lat\":23.2156,\"lng\":77.3941}}" }
+          }
+        },
+        {
+          "name": "Lit Street Route (Weather-Aware)",
+          "request": {
+            "method": "POST", "url": "{{BASE_URL}}/route/lit-street",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"origin\":{\"lat\":23.2599,\"lng\":77.4126},\"destination\":{\"lat\":23.2156,\"lng\":77.3941}}" }
+          }
+        },
+        {
+          "name": "Safe Refuges Nearby",
+          "request": {
+            "method": "POST", "url": "{{BASE_URL}}/route/safe-refuges",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"lat\":23.2599,\"lng\":77.4126,\"radius\":1000,\"types\":[\"police\",\"hospital\",\"cafe\"]}" }
+          }
+        },
+        {
+          "name": "Reroute (on deviation)",
+          "request": {
+            "method": "POST", "url": "{{BASE_URL}}/route/reroute",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"current_lat\":23.2650,\"current_lng\":77.4200,\"destination\":{\"lat\":23.2156,\"lng\":77.3941}}" }
+          }
+        },
+        { "name": "Route History", "request": { "method": "GET", "url": "{{BASE_URL}}/route/history" } }
+      ]
+    },
+    {
+      "name": "🔴 Crime Prediction",
+      "item": [
+        {
+          "name": "Risk Score for Location",
+          "request": { "method": "GET", "url": "{{BASE_URL}}/crime/risk/{{LAT}}/{{LNG}}" }
+        },
+        { "name": "Crime Hotspots", "request": { "method": "GET", "url": "{{BASE_URL}}/crime/hotspots" } },
+        { "name": "Crime Trends", "request": { "method": "GET", "url": "{{BASE_URL}}/crime/trends" } }
+      ]
+    },
+    {
+      "name": "📢 Reports",
+      "item": [
+        {
+          "name": "Submit Report (with image)",
+          "request": {
+            "method": "POST", "url": "{{BASE_URL}}/report",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "lat", "value": "23.2599", "type": "text" },
+                { "key": "lng", "value": "77.4126", "type": "text" },
+                { "key": "type", "value": "suspicious_activity", "type": "text" },
+                { "key": "description", "value": "Man following woman for 5 minutes", "type": "text" },
+                { "key": "severity", "value": "4", "type": "text" },
+                { "key": "image", "src": "", "type": "file", "disabled": true }
+              ]
+            }
+          }
+        },
+        { "name": "Heatmap Data", "request": { "method": "GET", "url": "{{BASE_URL}}/report/heatmap" } },
+        { "name": "Nearby Reports", "request": { "method": "GET", "url": "{{BASE_URL}}/report/nearby?lat={{LAT}}&lng={{LNG}}&radius=500" } },
+        { "name": "My Reports", "request": { "method": "GET", "url": "{{BASE_URL}}/report/my" } }
+      ]
+    },
+    {
+      "name": "🆘 SOS",
+      "item": [
+        {
+          "name": "Trigger SOS",
+          "request": {
+            "method": "POST", "url": "{{BASE_URL}}/sos/trigger",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "lat", "value": "23.2599", "type": "text" },
+                { "key": "lng", "value": "77.4126", "type": "text" },
+                { "key": "message", "value": "I feel unsafe near the old market", "type": "text" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Cancel SOS",
+          "request": {
+            "method": "POST", "url": "{{BASE_URL}}/sos/cancel",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"sos_id\":1}" }
+          }
+        },
+        { "name": "Fake Call", "request": { "method": "POST", "url": "{{BASE_URL}}/sos/fake-call", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"delay_seconds\":3,\"duration_seconds\":60}" } } },
+        { "name": "SOS History", "request": { "method": "GET", "url": "{{BASE_URL}}/sos/history" } }
+      ]
+    },
+    {
+      "name": "🛡️ Guardian",
+      "item": [
+        {
+          "name": "Invite Guardian",
+          "request": {
+            "method": "POST", "url": "{{BASE_URL}}/guardian/invite",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"guardian_email\":\"guardian@example.com\",\"permissions\":[\"view_location\",\"receive_sos\"]}" }
+          }
+        },
+        {
+          "name": "Respond to Guardian Invite",
+          "request": {
+            "method": "POST", "url": "{{BASE_URL}}/guardian/respond",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"relationship_id\":1,\"action\":\"accept\"}" }
+          }
+        },
+        { "name": "My Guardians", "request": { "method": "GET", "url": "{{BASE_URL}}/guardian/my-guardians" } },
+        { "name": "I Am Guardian For", "request": { "method": "GET", "url": "{{BASE_URL}}/guardian/i-am-guardian-for" } },
+        { "name": "Remove Guardian", "request": { "method": "DELETE", "url": "{{BASE_URL}}/guardian/1" } }
+      ]
+    },
+    {
+      "name": "🔒 Safety Features",
+      "item": [
+        {
+          "name": "Activate Health Mode",
+          "request": {
+            "method": "POST", "url": "{{BASE_URL}}/safety/health-mode/activate",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"active\":true}" }
+          }
+        },
+        { "name": "Health Mode Status", "request": { "method": "GET", "url": "{{BASE_URL}}/safety/health-mode/status" } },
+        {
+          "name": "Check In",
+          "request": {
+            "method": "POST", "url": "{{BASE_URL}}/safety/checkin",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"lat\":23.2599,\"lng\":77.4126,\"note\":\"Reached office safely\",\"battery_level\":78}" }
+          }
+        },
+        { "name": "Check-in History", "request": { "method": "GET", "url": "{{BASE_URL}}/safety/checkin/history" } },
+        {
+          "name": "Watch Sync",
+          "request": {
+            "method": "POST", "url": "{{BASE_URL}}/safety/watch/sync",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"device_type\":\"wear_os\",\"alerts\":[],\"route\":{\"steps\":[{\"html_instructions\":\"Turn left\"}],\"distance\":{\"text\":\"1.2 km\"},\"duration\":{\"text\":\"15 mins\"}}}" }
+          }
+        }
+      ]
+    }
+  ]
+}

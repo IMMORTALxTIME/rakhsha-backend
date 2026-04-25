@@ -1,0 +1,15 @@
+node_modules/
+.env
+logs/
+*.log
+scripts/crime_model.pkl
+certs/
+dist/
+coverage/
+.DS_Store
+*.local
+rakhsha-hackathon.env
+node_modules
+rakhsha-hackathon.env
+node_modules/
+.env
