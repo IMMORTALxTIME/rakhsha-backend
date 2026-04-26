@@ -50,7 +50,7 @@ initSocketManager(io);
 
 // ── Security Middleware ─────────────────────────────────────
 app.use(helmet({
-  contentSecurityPolicy: false, // Swagger UI needs inline scripts
+  contentSecurityPolicy: false, 
   crossOriginEmbedderPolicy: false,
 }));
 
@@ -103,7 +103,7 @@ app.use(`${API}/sos`,      sosRoutes);
 app.use(`${API}/guardian`, guardianRoutes);
 app.use(`${API}/safety`,   safetyRoutes);
 
-// Legacy route aliases (no /v1 prefix for mobile compatibility)
+// Legacy route aliases
 app.use('/api/auth',     authRoutes);
 app.use('/api/route',    routeRoutes);
 app.use('/api/crime',    crimeRoutes);
@@ -126,19 +126,23 @@ app.use('*', (req, res) => {
 app.use(globalErrorHandler);
 
 // ── Server Start ───────────────────────────────────────────
+// Railway provides the PORT variable automatically.
 const PORT = process.env.PORT || 8001;
 
 const startServer = async () => {
   try {
+    // Ensure your database config is reading the Railway DATABASE_URL correctly
     await testConnection();
-    createRedisClient();
-    initFirebase();
+    
+    // Optional: Only start Redis/Firebase if variables exist to prevent startup crashes
+    if (process.env.REDIS_URL) createRedisClient();
+    if (process.env.FIREBASE_PROJECT_ID) initFirebase();
 
     server.listen(PORT, '0.0.0.0', () => {
       logger.info(`🚀 Rakhsha backend running on port ${PORT}`);
-      logger.info(`📚 API Docs: http://localhost:${PORT}/api/docs`);
-      logger.info(`🏥 Health:   http://localhost:${PORT}/health`);
-      logger.info(`🌍 ENV: ${process.env.NODE_ENV}`);
+      // Use Railway's provided domain if available, otherwise fallback to localhost
+      const host = process.env.RAILWAY_PUBLIC_DOMAIN || `localhost:${PORT}`;
+      logger.info(`📚 API Docs: http://${host}/api/docs`);
     });
   } catch (err) {
     logger.error('Server startup failed', { error: err.message });
@@ -153,7 +157,7 @@ const shutdown = (signal) => {
     logger.info('HTTP server closed');
     process.exit(0);
   });
-  setTimeout(() => process.exit(1), 10000); // Force exit after 10s
+  setTimeout(() => process.exit(1), 10000); 
 };
 
 process.on('SIGTERM', () => shutdown('SIGTERM'));
